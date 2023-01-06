@@ -6,8 +6,6 @@ metadata:
   name: {{ template "fullname" . }}
   labels:
     app: {{ template "fullname" . }}
-  annotations:
-    vnotify.farcic.com/notify: "true"
 spec:
   selector:
     matchLabels:
@@ -23,16 +21,13 @@ spec:
     spec:
       containers:
       - name: {{ .Chart.Name }}
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
-{{- range $pkey, $pval := .Values.env }}
-        - name: {{ $pkey }}
-          value: {{ quote $pval }}
-{{- end }}
-        env:
         - name: DB
-          value: {{ template "fullname" . }}-db
+          value: mongodb://{{ template "fullname" . }}-db
+        - name: VERSION
+          value: {{ .Values.image.tag }}
         ports:
         - containerPort: {{ .Values.service.internalPort }}
         livenessProbe:
