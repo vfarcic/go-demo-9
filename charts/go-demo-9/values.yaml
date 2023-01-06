@@ -4,13 +4,13 @@ image:
   tag: 0.0.1
   pullPolicy: IfNotPresent
 
-env: {}
-
 service:
   type: ClusterIP
   externalPort: 80
   internalPort: 8080
-  annotations: {}
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8080"
 resources:
   limits:
     cpu: 100m
@@ -35,11 +35,14 @@ ingress:
 
 hpa:
   enabled: true
-  minReplicas: 2
+  minReplicas: 3
   maxReplicas: 6
   cpuTargetAverageUtilization: 80
   memoryTargetAverageUtilization: 80
 
+istio:
+  enabled: false
+
 go-demo-9-db:
-  replicaSet:
-    enabled: true
+  auth:
+    enabled: false

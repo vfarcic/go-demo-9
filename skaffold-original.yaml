@@ -1,0 +1,30 @@
+apiVersion: skaffold/v2alpha3
+kind: Config
+metadata:
+  name: go-demo-9
+build:
+  cluster:
+    namespace: dev
+    dockerConfig:
+      path: ~/.docker/config.json
+  artifacts:
+  - image: go-demo-9
+    kaniko: {}
+deploy:
+  kubectl:
+    manifests:
+    - k8s/*.yaml
+profiles:
+- name: dev-remote
+  build:
+    tagPolicy:
+      envTemplate:
+        template: "{{.IMAGE_NAME}}:{{.DEV_USER}}"
+- name: dev-local
+  build:
+    local: {}
+    artifacts:
+    - docker: {}
+      image: go-demo-9
+    tagPolicy:
+      sha256: {}

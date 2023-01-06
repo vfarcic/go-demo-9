@@ -1,30 +1,30 @@
-apiVersion: skaffold/v2alpha3
+apiVersion: skaffold/v4beta1
 kind: Config
 metadata:
   name: go-demo-9
 build:
-  cluster:
-    namespace: dev
-    dockerConfig:
-      path: ~/.docker/config.json
+  local:
+    push: false
   artifacts:
-  - image: go-demo-9
-    kaniko: {}
+    - image: go-demo-9
+      docker: {}
+  tagPolicy:
+    sha256: {}
 deploy:
-  kubectl:
-    manifests:
-    - k8s/*.yaml
-profiles:
-- name: dev-remote
-  build:
-    tagPolicy:
-      envTemplate:
-        template: "{{.IMAGE_NAME}}:{{.DEV_USER}}"
-- name: dev-local
-  build:
-    local: {}
-    artifacts:
-    - docker: {}
-      image: go-demo-9
-    tagPolicy:
-      sha256: {}
+  helm:
+    releases:
+      - name: go-demo-9
+        namespace: dev
+        createNamespace: true
+        chartPath: charts/go-demo-9
+        wait: true
+        valuesFiles:
+          - charts/dev/values.yaml
+        version: 0.0.1
+        setValueTemplates:
+          ingress.host: "{{ .ADDR }}"
+          image.repository: "{{.IMAGE_REPO_go_demo_9}}"
+          image.tag: "{{.IMAGE_TAG_go_demo_9}}"
+    flags:
+      upgrade:
+        - --install

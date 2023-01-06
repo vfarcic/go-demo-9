@@ -1,9 +1,10 @@
 image:
+  repository: go-demo-9
   tag: latest
 hpa:
   enabled: false
 go-demo-9-db:
-  replicaSet:
+  auth:
     enabled: false
   persistence:
     enabled: false
